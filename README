@@ -1,5 +1,6 @@
 This code provides a scalable duplicate detection for a database containing 1624 product descriptions of televisions.
 The duplicate products are found by the titles of the products on their respective webshops.
+The code starts with data retraction and preparation. After that, the methods are defined.
 The methods used are k-shingles, MinHashing, LSH and Jaccard Similarity. In the end, the method is evaluated 
 by some evaluation measures on efficiency and efficacy.
 
