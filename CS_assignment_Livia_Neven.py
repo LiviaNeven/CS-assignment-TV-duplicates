@@ -1,13 +1,6 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import pandas as pd
 import numpy as np
 import json
-from matplotlib import pyplot as plt
 import json
 import math
 import re
@@ -15,7 +8,6 @@ import itertools
 import random
 import itertools
 import sys
-from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from collections import defaultdict
 from datasketch import MinHash,MinHashLSH
@@ -32,10 +24,8 @@ from collections import defaultdict
 from collections import Counter
 import matplotlib.pyplot as plt
 from sklearn.metrics import f1_score
-
-
-# In[2]:
-
+from matplotlib import pyplot as plt
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Get the data from the dataset
 file_path = 'TVs-all-merged.json' 
@@ -54,10 +44,6 @@ for products in data.values():
 
 original_title_to_modelid = dict(zip(product_titles, model_ids))
 index_to_modelid = {idx: model_id for idx, model_id in enumerate(model_ids)}
-
-
-# In[3]:
-
 
 def normalize_terms(text):
     
@@ -100,10 +86,6 @@ def preprocess_modelID(modelID):
 
 preprocessed_modelID = [preprocess_modelID(product['modelID']) for products in data.values() for product in products]
 
-
-# In[4]:
-
-
 #Generate shingles from the title
 def generate_shingles(title):
     title = normalize_terms(title)
@@ -114,10 +96,6 @@ def generate_shingles(title):
     return shingles
 
 print(generate_shingles(preprocessed_titles_dict[0]))
-
-
-# In[5]:
-
 
 #Compute minhash signatures
 num_perm = 500
@@ -132,10 +110,6 @@ def generate_signature_matrix(preprocessed_titles, num_perm):
     signature_matrix = np.array([[minhash.hashvalues[i] for minhash in minhashes] for i in range(num_perm)])
     
     return signature_matrix
-
-
-# In[6]:
-
 
 def hash_vector_to_bucket(vector, num_buckets=2**24): 
 
@@ -166,10 +140,6 @@ def apply_lsh(signature_matrix, b, r, num_buckets=2**24):
 
     return candidate_pairs
 
-
-# In[7]:
-
-
 # Calculate the actual number of duplicates
 modelID_to_indices = {}
 for index, model_id in index_to_modelid.items():
@@ -185,10 +155,6 @@ for model_id, indices in modelID_to_indices.items():
 
 # Number of true duplicates
 print(f"Total number of actual duplicates: {total_actual_duplicates}")
-
-
-# In[8]:
-
 
 #Jaccard Similarity
 def estimate_jaccard_similarity(pair_indices, signature_matrix):
@@ -219,11 +185,6 @@ def is_duplicate(pair_indices, model_ids):
     
     return True
 
-
-
-# In[9]:
-
-
 # Determine all possible values for b and r 
 n = num_perm
 possible_values_b = []
@@ -238,10 +199,6 @@ for b in range(1, n + 1):
         
 print(possible_values_b)
 print(possible_values_r)
-
-
-# In[11]:
-
 
 #Parameter tuning
 b_values = possible_values_b
@@ -317,10 +274,6 @@ plt.ylabel('F1* Score %')
 plt.title('Threshold vs F1* Score for n=500')
 plt.grid(True)
 plt.show()
-
-
-# In[25]:
-
 
 #Bootstrapping 
 b = possible_values_b
@@ -422,29 +375,21 @@ for b, r in zip(b_values, r_values):
     f1_star_avg.append(avg_f1_star)
     frac_of_comp_avg.append(avg_frac_of_comp)
     
-
-
-# In[24]:
-
-
 plt.plot(frac_of_comp_avg, pq_avg, marker='o')
 plt.xlabel('Fraction of Comparisons')
 plt.ylabel('Pair Quality')
-#plt.title('F1 vs Fraction of Comparisons')
 plt.grid(True)
 plt.show()
 
 plt.plot(frac_of_comp_avg, pc_avg, marker='o')
 plt.xlabel('Fraction of Comparisons')
 plt.ylabel('Pair Completeness')
-#plt.title('F1* vs Fraction of Comparisons')
 plt.grid(True)
 plt.show()
 
 plt.plot(frac_of_comp_avg, f1_avg, marker='o')
 plt.xlabel('Fraction of Comparisons')
 plt.ylabel('F1 score')
-#plt.title('pq vs Fraction of Comparisons')
 plt.grid(True)
 plt.show()
 
